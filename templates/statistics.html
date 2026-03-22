@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Статистика — FISH-MVP{% endblock %}
+{% block content %}
+<h1>Статистика</h1>
+<div id="stats">
+    <p>Всего выловов: <strong id="totalCatches">0</strong></p>
+    <p>Общая сумма: <strong id="totalSum">0</strong></p>
+</div>
+<table id="byPerm">
+    <thead>
+        <tr>
+            <th>Разрешение</th>
+            <th>Кол-во</th>
+            <th>Сумма</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<p><button class="btn" id="btnExport">Экспорт CSV</button></p>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('btnExport').onclick = ()=>{
+    fetch('/api/export-catches', {credentials:'include'}).then(r=>r.blob()).then(blob=>{
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'catches.csv';
+        a.click();
+    });
+};
+fetch('/api/statistics').then(r=>r.json()).then(d=>{
+    document.getElementById('totalCatches').textContent = d.total_catches || 0;
+    document.getElementById('totalSum').textContent = (d.total_sum || 0).toFixed(2);
+    const tbody = document.querySelector('#byPerm tbody');
+    (d.by_permission || []).forEach(row=>{
+        const tr = tbody.insertRow();
+        tr.innerHTML = '<td>'+row.Разрешение+'</td><td>'+row.cnt+'</td><td>'+row.total+'</td>';
+    });
+});
+</script>
+{% endblock %}

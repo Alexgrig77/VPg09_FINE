@@ -1,0 +1,44 @@
+# Промпт 07: API разрешений и рыбы
+
+**Этап:** 4.1 API  
+**Среда:** [ЛОКАЛЬНО]
+
+## Контекст
+
+БД и auth готовы. Нужны API-эндпоинты для Разрешений и Рыбы: CRUD, поиск, списки.
+
+## Задача
+
+GET/POST /api/permissions, GET/PUT/DELETE /api/permissions/<id>. Аналогично для /api/fish. Поиск через query-параметр q.
+
+## Критерии приёмки
+
+- Все CRUD-операции работают
+- Поиск возвращает отфильтрованные записи
+- Эндпоинты защищены login_required (кроме login)
+
+## Текст промпта
+
+```
+Добавь API для Разрешений и Рыбы в FISH-MVP (app.py):
+
+1. Эндпоинты разрешений:
+   - GET /api/permissions — список (опционально ?q=поиск)
+   - GET /api/permissions/<id> — одна запись
+   - POST /api/permissions — создание (JSON body)
+   - PUT /api/permissions/<id> — обновление
+   - DELETE /api/permissions/<id> — удаление
+
+2. Эндпоинты рыбы:
+   - GET /api/fish — список (?q=поиск)
+   - GET /api/fish/<id> — одна запись
+   - POST /api/fish — создание
+   - PUT /api/fish/<id> — обновление
+   - DELETE /api/fish/<id> — удаление
+
+3. Добавь декоратор @login_required (проверка session) — защитить все /api/* кроме /api/auth/login.
+
+4. Добавь FishDatabase методы для CRUD разрешений и рыбы в application/models/fish_database.py.
+
+Используй jsonify для ответов. При ошибке возвращай {error: "..."} с кодом 400/404.
+"""

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Разрешения — FISH-MVP{% endblock %}
+{% block content %}
+<h1>Разрешения</h1>
+<div class="toolbar">
+    <input type="text" id="search" placeholder="Поиск...">
+    <button id="btnAdd">Добавить</button>
+</div>
+<table id="table">
+    <thead>
+        <tr>
+            <th>Номер</th>
+            <th>Год</th>
+            <th>Район</th>
+            <th>Ответственный</th>
+            <th>Групповое</th>
+            <th>Лимит кг</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Разрешение</h3>
+        <form id="form">
+            <input type="hidden" name="id">
+            <label>Номер разрешения <input name="Номер_разрешения" required></label>
+            <label>Год <input name="Год" type="text" required></label>
+            <label>Район промысла <input name="Район_промысла"></label>
+            <label>Ответственный <input name="Ответственный"></label>
+            <label>Наименование групповое <input name="Наименование_групповое"></label>
+            <label>Лимит кг <input name="Лимит_кг" type="number"></label>
+            <button type="submit">Сохранить</button>
+            <button type="button" id="btnCancel">Отмена</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/permissions.js"></script>
+{% endblock %}

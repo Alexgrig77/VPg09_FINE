@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FISH-MVP{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <nav class="nav">
+        <a href="/">Главная</a>
+        <a href="/permissions.html">Разрешения</a>
+        <a href="/fish.html">Рыба</a>
+        <a href="/catches.html">Выловы</a>
+        <a href="/statistics.html">Статистика</a>
+        <span class="user" id="userName"></span>
+        <button id="btnLogout">Выход</button>
+    </nav>
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+    <script>
+        fetch('/api/auth/current').then(r=>r.json()).then(d=>{
+            if(d.user) document.getElementById('userName').textContent = d.user.username;
+        });
+        document.getElementById('btnLogout').onclick = ()=> {
+            fetch('/api/auth/logout', {method:'POST'}).then(()=>location.href='/login.html');
+        };
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

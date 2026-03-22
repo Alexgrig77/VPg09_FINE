@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Выловы — FISH-MVP{% endblock %}
+{% block content %}
+<h1>Выловы</h1>
+<div class="toolbar">
+    <button id="btnAdd">Добавить</button>
+</div>
+<table id="table">
+    <thead>
+        <tr>
+            <th>Разрешение</th>
+            <th>Дата</th>
+            <th>Рыба</th>
+            <th>Кол-во</th>
+            <th>Сумма</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3>Вылов</h3>
+        <form id="form">
+            <input type="hidden" name="id">
+            <label>Разрешение <select name="Разрешение" required></select></label>
+            <label>Дата <input name="Дата_вылова" type="date" required></label>
+            <label>Рыба <select name="Наименование_рыбы" required></select></label>
+            <label>Количество <input name="Количество" type="number" required></label>
+            <button type="submit">Сохранить</button>
+            <button type="button" id="btnCancel">Отмена</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/catches.js"></script>
+{% endblock %}

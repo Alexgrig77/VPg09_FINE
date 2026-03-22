@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Рыба — FISH-MVP{% endblock %}
+{% block content %}
+<h1>Рыба</h1>
+<div class="toolbar">
+    <input type="text" id="search" placeholder="Поиск...">
+    <button id="btnAdd">Добавить</button>
+</div>
+<table id="table">
+    <thead>
+        <tr>
+            <th>Наименование</th>
+            <th>Групповое</th>
+            <th>Цена</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3>Рыба</h3>
+        <form id="form">
+            <input type="hidden" name="id">
+            <label>Наименование <input name="Наименование_рыбы" required></label>
+            <label>Групповое <input name="Наименование_групповое"></label>
+            <label>Цена <input name="Цена" type="number" step="0.01"></label>
+            <button type="submit">Сохранить</button>
+            <button type="button" id="btnCancel">Отмена</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/fish.js"></script>
+{% endblock %}

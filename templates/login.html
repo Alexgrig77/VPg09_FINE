@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — FISH-MVP</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="login-box">
+        <h1>FISH-MVP</h1>
+        <p>База разрешений на рыболовство</p>
+        <form id="loginForm">
+            <input type="text" name="username" placeholder="Логин" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+        <p id="errMsg" class="error"></p>
+    </div>
+    <script>
+        document.getElementById('loginForm').onsubmit = async (e)=>{
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const r = await fetch('/api/auth/login', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({username:fd.get('username'), password:fd.get('password')})
+            });
+            const d = await r.json();
+            if(r.ok) location.href = '/';
+            else document.getElementById('errMsg').textContent = d.error || 'Ошибка входа';
+        };
+    </script>
+</body>
+</html>
