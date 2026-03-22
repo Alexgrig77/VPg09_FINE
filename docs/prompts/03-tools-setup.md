@@ -37,7 +37,7 @@
 
 5. .gitignore — venv, __pycache__, .env, *.db, data/*.db, logs/
 
-6. app.py — минимальный Flask app с одной route "/" возвращающей "FISH-MVP OK"
+6. app.py — минимальный Flask app с одной route "/" возвращающей JSON или текст "FISH-MVP OK"
 
 Создай __init__.py в application, application/models, application/routes, application/utils. Добавь версионирование в app.py если нужно (VERSION = "1.0.0").
 ```
