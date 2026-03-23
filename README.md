@@ -16,6 +16,13 @@
 ## Запуск
 
 ```powershell
+# 0. Создайте файл .env
+#    - Скопируйте: cp .env.example .env
+#    - Задайте минимум:
+#        SECRET_KEY (случайная строка)
+#        FLASK_ENV (development | production | testing)
+#    - DATABASE_PATH — путь к SQLite БД (обычно оставьте как есть)
+
 # 1. Установка зависимостей
 pip install -r requirements.txt
 
