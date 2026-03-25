@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Главная — FISH-MVP{% endblock %}
 {% block content %}
-<h1>FISH-MVP</h1>
-<p>База разрешений на рыболовство — учёт разрешений, рыбы и выловов.</p>
-<ul>
-    <li><a href="/permissions.html">Разрешения</a> — просмотр и управление</li>
-    <li><a href="/fish.html">Рыба</a> — справочник видов</li>
-    <li><a href="/catches.html">Выловы</a> — учёт выловов</li>
-    <li><a href="/statistics.html">Статистика</a> — сводные данные и экспорт</li>
+<div class="home-intro">
+    <h1>FISH-MVP</h1>
+    <p class="home-lead">База разрешений на рыболовство — учёт разрешений, рыбы и выловов.</p>
+</div>
+<ul class="home-links">
+    <li><a href="/permissions.html"><span class="home-link-title">Разрешения</span><span class="home-link-desc">Просмотр и управление</span></a></li>
+    <li><a href="/fish.html"><span class="home-link-title">Рыба</span><span class="home-link-desc">Справочник видов</span></a></li>
+    <li><a href="/catches.html"><span class="home-link-title">Выловы</span><span class="home-link-desc">Учёт выловов</span></a></li>
+    <li><a href="/statistics.html"><span class="home-link-title">Статистика</span><span class="home-link-desc">Сводные данные и экспорт</span></a></li>
 </ul>
 {% endblock %}

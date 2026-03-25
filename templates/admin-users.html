@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Сотрудники — FISH-MVP{% endblock %}
+{% block content %}
+<h1>Сотрудники</h1>
+
+<div class="toolbar">
+    <button id="btnReload" class="btn" type="button">Обновить</button>
+</div>
+
+<div class="modal-content" style="margin-bottom: 1.25rem;">
+    <h3 style="margin-top: 0;">Добавить сотрудника</h3>
+    <p style="margin-top: 0; color: #64748b; font-size: 0.95rem;">
+        Доступ сотрудника ограничен разрешениями, где поле <b>Ответственный</b> совпадает с <b>full_name</b>.
+    </p>
+    <form id="createForm">
+        <label>
+            Логин
+            <input name="username" type="text" required>
+        </label>
+        <label>
+            Сотрудник (Ответственный)
+            <select name="full_name" id="fullNameSelect" required></select>
+        </label>
+        <label>
+            Пароль
+            <input name="password" type="password" required>
+        </label>
+        <button type="submit">Создать</button>
+    </form>
+</div>
+
+<table id="usersTable" class="has-actions">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Логин</th>
+            <th>Ответственный</th>
+            <th>Роль</th>
+            <th>Статус</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin-users.js"></script>
+{% endblock %}
+

@@ -5,6 +5,14 @@ const tbody = document.querySelector('#table tbody');
 const permSelect = form.querySelector('[name="Разрешение"]');
 const fishSelect = form.querySelector('[name="Наименование_рыбы"]');
 
+let isAdmin = false;
+
+async function initRole() {
+    const r = await fetch('/api/auth/current', { credentials: 'include' });
+    const d = await r.json();
+    isAdmin = !!(d.user && d.user.role === 'admin');
+}
+
 async function loadOptions() {
     const [pRes, fRes] = await Promise.all([
         fetch('/api/permission-numbers', {credentials:'include'}),
@@ -28,13 +36,17 @@ function load() {
                 <td>${r.Количество||''}</td>
                 <td>${r.Сумма!=null?r.Сумма:''}</td>
                 <td>
-                    <button class="sm" data-edit="${r.id}">Ред</button>
-                    <button class="sm" data-del="${r.id}">Удал</button>
+                    ${isAdmin ? `
+                        <button class="sm" data-edit="${r.id}">Ред</button>
+                        <button class="sm" data-del="${r.id}">Удал</button>
+                    ` : ``}
                 </td>
             `;
         });
-        tbody.querySelectorAll('[data-edit]').forEach(btn=> btn.onclick = ()=>edit(parseInt(btn.dataset.edit)));
-        tbody.querySelectorAll('[data-del]').forEach(btn=> btn.onclick = ()=>del(parseInt(btn.dataset.del)));
+        if (isAdmin) {
+            tbody.querySelectorAll('[data-edit]').forEach(btn=> btn.onclick = ()=>edit(parseInt(btn.dataset.edit)));
+            tbody.querySelectorAll('[data-del]').forEach(btn=> btn.onclick = ()=>del(parseInt(btn.dataset.del)));
+        }
     });
 }
 
@@ -79,4 +91,4 @@ form.onsubmit = async (e)=>{
     if(r.ok) { modal.classList.remove('show'); load(); }
     else alert(j.error || 'Ошибка');
 };
-load();
+initRole().then(()=>load());

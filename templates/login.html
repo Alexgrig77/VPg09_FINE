@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход — FISH-MVP</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css?v=3">
 </head>
-<body>
+<body class="login-body">
+    <div class="login-page">
     <div class="login-box">
         <h1>FISH-MVP</h1>
         <p>База разрешений на рыболовство</p>
@@ -16,6 +17,7 @@
             <button type="submit">Войти</button>
         </form>
         <p id="errMsg" class="error"></p>
+    </div>
     </div>
     <script>
         document.getElementById('loginForm').onsubmit = async (e)=>{

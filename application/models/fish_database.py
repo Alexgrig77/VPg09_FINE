@@ -67,16 +67,25 @@ class FishDatabase:
         finally:
             conn.close()
 
-    def get_all_permissions(self, search=None):
+    def get_all_permissions(self, search=None, responsible=None):
         conn = self.get_connection()
         cursor = conn.cursor()
         try:
-            if search:
+            if search and responsible:
+                cursor.execute("""
+                    SELECT * FROM Разрешения
+                    WHERE (Номер_разрешения LIKE ? OR Район_промысла LIKE ? OR Ответственный LIKE ? OR Наименование_групповое LIKE ?)
+                    AND Ответственный = ?
+                    ORDER BY id DESC
+                """, (f'%{search}%', f'%{search}%', f'%{search}%', f'%{search}%', responsible))
+            elif search:
                 cursor.execute("""
                     SELECT * FROM Разрешения WHERE Номер_разрешения LIKE ? OR Район_промысла LIKE ?
                     OR Ответственный LIKE ? OR Наименование_групповое LIKE ?
                     ORDER BY id DESC
                 """, (f'%{search}%', f'%{search}%', f'%{search}%', f'%{search}%'))
+            elif responsible:
+                cursor.execute("SELECT * FROM Разрешения WHERE Ответственный = ? ORDER BY id DESC", (responsible,))
             else:
                 cursor.execute("SELECT * FROM Разрешения ORDER BY id DESC")
             return [dict(r) for r in cursor.fetchall()]
@@ -230,11 +239,27 @@ class FishDatabase:
         finally:
             conn.close()
 
-    def get_all_catches(self, permission=None, fish=None):
+    def get_all_catches(self, permission=None, fish=None, responsible=None):
         conn = self.get_connection()
         cursor = conn.cursor()
         try:
-            if permission:
+            if responsible:
+                base = """
+                    SELECT * FROM Выловы
+                    WHERE Разрешение IN (
+                        SELECT Номер_разрешения FROM Разрешения WHERE Ответственный = ?
+                    )
+                """
+                params = [responsible]
+                if permission:
+                    base += " AND Разрешение = ?"
+                    params.append(permission)
+                if fish:
+                    base += " AND Наименование_рыбы = ?"
+                    params.append(fish)
+                base += " ORDER BY id DESC"
+                cursor.execute(base, tuple(params))
+            elif permission:
                 cursor.execute("SELECT * FROM Выловы WHERE Разрешение = ? ORDER BY id DESC", (permission,))
             elif fish:
                 cursor.execute("SELECT * FROM Выловы WHERE Наименование_рыбы = ? ORDER BY id DESC", (fish,))
@@ -311,16 +336,35 @@ class FishDatabase:
         finally:
             conn.close()
 
-    def get_statistics(self):
+    def get_statistics(self, responsible=None):
         conn = self.get_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("SELECT COUNT(*) as cnt, COALESCE(SUM(Сумма), 0) as total FROM Выловы")
+            if responsible:
+                cursor.execute("""
+                    SELECT COUNT(*) as cnt, COALESCE(SUM(Сумма), 0) as total
+                    FROM Выловы
+                    WHERE Разрешение IN (
+                        SELECT Номер_разрешения FROM Разрешения WHERE Ответственный = ?
+                    )
+                """, (responsible,))
+            else:
+                cursor.execute("SELECT COUNT(*) as cnt, COALESCE(SUM(Сумма), 0) as total FROM Выловы")
             r = cursor.fetchone()
-            cursor.execute("""
-                SELECT Разрешение, COUNT(*) as cnt, COALESCE(SUM(Сумма), 0) as total
-                FROM Выловы GROUP BY Разрешение
-            """)
+            if responsible:
+                cursor.execute("""
+                    SELECT Разрешение, COUNT(*) as cnt, COALESCE(SUM(Сумма), 0) as total
+                    FROM Выловы
+                    WHERE Разрешение IN (
+                        SELECT Номер_разрешения FROM Разрешения WHERE Ответственный = ?
+                    )
+                    GROUP BY Разрешение
+                """, (responsible,))
+            else:
+                cursor.execute("""
+                    SELECT Разрешение, COUNT(*) as cnt, COALESCE(SUM(Сумма), 0) as total
+                    FROM Выловы GROUP BY Разрешение
+                """)
             by_perm = [dict(row) for row in cursor.fetchall()]
             return {
                 'total_catches': r['cnt'] or 0,
@@ -330,11 +374,18 @@ class FishDatabase:
         finally:
             conn.close()
 
-    def get_permission_numbers(self):
+    def get_permission_numbers(self, responsible=None):
         conn = self.get_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("SELECT DISTINCT Номер_разрешения FROM Разрешения ORDER BY Номер_разрешения")
+            if responsible:
+                cursor.execute("""
+                    SELECT DISTINCT Номер_разрешения FROM Разрешения
+                    WHERE Ответственный = ?
+                    ORDER BY Номер_разрешения
+                """, (responsible,))
+            else:
+                cursor.execute("SELECT DISTINCT Номер_разрешения FROM Разрешения ORDER BY Номер_разрешения")
             return [r['Номер_разрешения'] for r in cursor.fetchall()]
         finally:
             conn.close()
@@ -345,5 +396,32 @@ class FishDatabase:
         try:
             cursor.execute("SELECT DISTINCT Наименование_рыбы FROM Рыба ORDER BY Наименование_рыбы")
             return [r['Наименование_рыбы'] for r in cursor.fetchall()]
+        finally:
+            conn.close()
+
+    def get_responsibles(self):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT DISTINCT TRIM(Ответственный) AS Ответственный
+                FROM Разрешения
+                WHERE Ответственный IS NOT NULL AND TRIM(Ответственный) != ''
+                ORDER BY Ответственный
+            """)
+            return [r['Ответственный'] for r in cursor.fetchall()]
+        finally:
+            conn.close()
+
+    def has_permission_for_responsible(self, permission_number, responsible):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT 1 FROM Разрешения
+                WHERE Номер_разрешения = ? AND Ответственный = ?
+                LIMIT 1
+            """, (permission_number, responsible))
+            return cursor.fetchone() is not None
         finally:
             conn.close()

@@ -6,7 +6,14 @@
     <input type="text" id="search" placeholder="Поиск...">
     <button id="btnAdd">Добавить</button>
 </div>
-<table id="table">
+<div class="table-wrap">
+<table id="table" class="has-actions">
+    <colgroup>
+        <col style="width:30%">
+        <col style="width:28%">
+        <col style="width:14%">
+        <col style="width:28%">
+    </colgroup>
     <thead>
         <tr>
             <th>Наименование</th>
@@ -17,6 +24,7 @@
     </thead>
     <tbody></tbody>
 </table>
+</div>
 <div id="modal" class="modal">
     <div class="modal-content">
         <h3>Рыба</h3>

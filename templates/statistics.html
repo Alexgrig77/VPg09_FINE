@@ -2,10 +2,17 @@
 {% block title %}Статистика — FISH-MVP{% endblock %}
 {% block content %}
 <h1>Статистика</h1>
-<div id="stats">
-    <p>Всего выловов: <strong id="totalCatches">0</strong></p>
-    <p>Общая сумма: <strong id="totalSum">0</strong></p>
+<div class="stats-grid" id="stats">
+    <div class="stat-card">
+        <span class="stat-label">Всего выловов</span>
+        <strong class="stat-value" id="totalCatches">0</strong>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Общая сумма</span>
+        <strong class="stat-value" id="totalSum">0</strong>
+    </div>
 </div>
+<div class="table-wrap">
 <table id="byPerm">
     <thead>
         <tr>
@@ -16,7 +23,10 @@
     </thead>
     <tbody></tbody>
 </table>
-<p><button class="btn" id="btnExport">Экспорт CSV</button></p>
+</div>
+<div class="toolbar stats-toolbar">
+    <button class="btn" id="btnExport" type="button">Экспорт CSV</button>
+</div>
 {% endblock %}
 {% block scripts %}
 <script>

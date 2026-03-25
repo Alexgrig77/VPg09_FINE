@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}FISH-MVP{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css?v=3">
 </head>
 <body>
     <nav class="nav">
@@ -13,15 +13,27 @@
         <a href="/fish.html">Рыба</a>
         <a href="/catches.html">Выловы</a>
         <a href="/statistics.html">Статистика</a>
+        <a href="/admin-users.html" id="adminNavLink" style="display:none;">Сотрудники</a>
         <span class="user" id="userName"></span>
         <button id="btnLogout">Выход</button>
     </nav>
     <main class="content">
-        {% block content %}{% endblock %}
+        <div class="panel">
+            {% block content %}{% endblock %}
+        </div>
     </main>
     <script>
         fetch('/api/auth/current').then(r=>r.json()).then(d=>{
-            if(d.user) document.getElementById('userName').textContent = d.user.username;
+            if (!d.user) return;
+            document.getElementById('userName').textContent = d.user.username;
+            if (d.user.role === 'admin') {
+                const adminLink = document.getElementById('adminNavLink');
+                if (adminLink) adminLink.style.display = 'inline-block';
+            } else {
+                // Сотруднику не нужен раздел справочника рыбы
+                const fishLink = document.querySelector('.nav a[href="/fish.html"]');
+                if (fishLink) fishLink.style.display = 'none';
+            }
         });
         document.getElementById('btnLogout').onclick = ()=> {
             fetch('/api/auth/logout', {method:'POST'}).then(()=>location.href='/login.html');

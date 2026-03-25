@@ -59,6 +59,53 @@ class AuthDatabase:
         finally:
             conn.close()
 
+    def list_users(self, include_admin=True):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            if include_admin:
+                cursor.execute("""
+                    SELECT id, username, full_name, role, is_active, created_at
+                    FROM Пользователи
+                    ORDER BY role DESC, username
+                """)
+            else:
+                cursor.execute("""
+                    SELECT id, username, full_name, role, is_active, created_at
+                    FROM Пользователи
+                    WHERE role != 'admin'
+                    ORDER BY username
+                """)
+            return [dict(r) for r in cursor.fetchall()]
+        finally:
+            conn.close()
+
+    def update_user_status(self, user_id, is_active):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "UPDATE Пользователи SET is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                (1 if is_active else 0, user_id),
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+        finally:
+            conn.close()
+
+    def change_user_password(self, user_id, new_password):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "UPDATE Пользователи SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                (generate_password_hash(new_password), user_id),
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+        finally:
+            conn.close()
+
     def get_user_by_id(self, user_id):
         conn = self.get_connection()
         cursor = conn.cursor()
