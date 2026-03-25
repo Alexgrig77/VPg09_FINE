@@ -14,14 +14,24 @@ async function initRole() {
 }
 
 async function loadOptions() {
-    const [pRes, fRes] = await Promise.all([
-        fetch('/api/permission-numbers', {credentials:'include'}),
-        fetch('/api/fish-names', {credentials:'include'})
-    ]);
+    const pRes = await fetch('/api/permission-numbers', {credentials:'include'});
     const perms = await pRes.json();
-    const fish = await fRes.json();
     permSelect.innerHTML = '<option value="">—</option>' + perms.map(p=>`<option value="${p}">${p}</option>`).join('');
-    fishSelect.innerHTML = '<option value="">—</option>' + fish.map(f=>`<option value="${f}">${f}</option>`).join('');
+    fishSelect.innerHTML = '<option value="">—</option>';
+}
+
+async function updateFishOptions(permissionNumber, selectedFish) {
+    const perm = (permissionNumber || '').toString();
+    if (!perm) {
+        fishSelect.innerHTML = '<option value="">—</option>';
+        fishSelect.value = '';
+        return;
+    }
+
+    const r = await fetch(`/api/fish-names?permission=${encodeURIComponent(perm)}`, {credentials:'include'});
+    const fish = await r.json();
+    fishSelect.innerHTML = '<option value="">—</option>' + (fish || []).map(f=>`<option value="${f}">${f}</option>`).join('');
+    if (selectedFish) fishSelect.value = selectedFish;
 }
 
 function load() {
@@ -53,10 +63,13 @@ function load() {
 async function showModal(rec){
     await loadOptions();
     form.querySelector('[name="id"]').value = rec?.id || '';
-    form.querySelector('[name="Разрешение"]').value = rec?.Разрешение || '';
+    const selectedPermission = rec?.Разрешение || '';
+    form.querySelector('[name="Разрешение"]').value = selectedPermission;
     form.querySelector('[name="Дата_вылова"]').value = rec?.Дата_вылова || '';
-    form.querySelector('[name="Наименование_рыбы"]').value = rec?.Наименование_рыбы || '';
+    const selectedFish = rec?.Наименование_рыбы || '';
+    form.querySelector('[name="Наименование_рыбы"]').value = selectedFish;
     form.querySelector('[name="Количество"]').value = rec?.Количество || '';
+    await updateFishOptions(selectedPermission, selectedFish);
     modal.classList.add('show');
 }
 
@@ -74,6 +87,7 @@ function del(id){
 
 document.getElementById('btnAdd').onclick = ()=>showModal(null);
 document.getElementById('btnCancel').onclick = ()=>modal.classList.remove('show');
+permSelect.onchange = ()=>updateFishOptions(permSelect.value, null);
 form.onsubmit = async (e)=>{
     e.preventDefault();
     const fd = new FormData(form);

@@ -9,6 +9,8 @@ async function initRole() {
     const r = await fetch('/api/auth/current', { credentials: 'include' });
     const d = await r.json();
     isAdmin = !!(d.user && d.user.role === 'admin');
+    const btnAdd = document.getElementById('btnAdd');
+    if (btnAdd) btnAdd.style.display = isAdmin ? '' : 'none';
 }
 
 function load(q) {
@@ -44,6 +46,7 @@ function load(q) {
 }
 
 function showModal(rec){
+    if (!isAdmin) return; // Подстраховка: на сервере тоже есть проверка доступа
     form.querySelector('[name="id"]').value = rec?.id || '';
     form.querySelector('[name="Номер_разрешения"]').value = rec?.Номер_разрешения || '';
     form.querySelector('[name="Год"]').value = rec?.Год || '';

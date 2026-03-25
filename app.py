@@ -381,7 +381,20 @@ def permission_numbers():
 @app.route('/api/fish-names')
 @login_required
 def fish_names():
-    return jsonify(fish_db.get_fish_names())
+    user = _current_user()
+    permission = (request.args.get('permission') or '').strip()
+    if not permission:
+        return jsonify(fish_db.get_fish_names())
+
+    if _is_admin(user):
+        return jsonify(fish_db.get_fish_names_by_permission(permission_number=permission))
+
+    # Сотрудник может получить список рыбы только для своих разрешений
+    responsible = user['full_name']
+    if not fish_db.has_permission_for_responsible(permission, responsible):
+        return jsonify({'error': 'Доступ запрещен'}), 403
+
+    return jsonify(fish_db.get_fish_names_by_permission(permission_number=permission, responsible=responsible))
 
 
 # --- Pages ---

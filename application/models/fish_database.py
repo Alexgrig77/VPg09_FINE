@@ -399,6 +399,63 @@ class FishDatabase:
         finally:
             conn.close()
 
+    def get_fish_names_by_permission(self, permission_number, responsible=None):
+        """
+        Вернуть список названий рыбы, доступных для выбранного разрешения.
+        В MVP логика такая: разрешение имеет `Наименование_групповое`, а в таблице `Рыба`
+        есть `Наименование_групповое`. Берём рыбу, у которой группа совпадает с группой разрешения.
+        """
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            # 1) Забираем "группы" рыбы из разрешения
+            if responsible:
+                cursor.execute(
+                    """
+                    SELECT DISTINCT TRIM(Наименование_групповое) AS g
+                    FROM Разрешения
+                    WHERE Номер_разрешения = ?
+                      AND Ответственный = ?
+                      AND Наименование_групповое IS NOT NULL
+                      AND TRIM(Наименование_групповое) != ''
+                    """,
+                    (permission_number, responsible),
+                )
+            else:
+                cursor.execute(
+                    """
+                    SELECT DISTINCT TRIM(Наименование_групповое) AS g
+                    FROM Разрешения
+                    WHERE Номер_разрешения = ?
+                      AND Наименование_групповое IS NOT NULL
+                      AND TRIM(Наименование_групповое) != ''
+                    """,
+                    (permission_number,),
+                )
+
+            perm_groups = [r['g'] for r in cursor.fetchall() if r['g']]
+            if not perm_groups:
+                return []
+
+            # 2) Пытаемся найти рыбу в справочнике Рыба по совпадению группы
+            placeholders = ','.join('?' * len(perm_groups))
+            cursor.execute(
+                f"""
+                SELECT DISTINCT TRIM(Наименование_рыбы) AS name
+                FROM Рыба
+                WHERE TRIM(Наименование_групповое) IN ({placeholders})
+                ORDER BY name
+                """,
+                tuple(perm_groups),
+            )
+            fish_names = [r['name'] for r in cursor.fetchall() if r['name']]
+
+            # 3) Если в справочнике Рыба нет соответствий (например, разрешение заполнено,
+            # а Рыба пока не содержит нужных записей) — используем группы разрешения как fallback.
+            return fish_names if fish_names else perm_groups
+        finally:
+            conn.close()
+
     def get_responsibles(self):
         conn = self.get_connection()
         cursor = conn.cursor()

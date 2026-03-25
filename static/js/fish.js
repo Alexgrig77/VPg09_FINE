@@ -9,6 +9,8 @@ async function initRole() {
     const r = await fetch('/api/auth/current', { credentials: 'include' });
     const d = await r.json();
     isAdmin = !!(d.user && d.user.role === 'admin');
+    const btnAdd = document.getElementById('btnAdd');
+    if (btnAdd) btnAdd.style.display = isAdmin ? '' : 'none';
 }
 
 function load(q) {
@@ -37,6 +39,7 @@ function load(q) {
 }
 
 function showModal(rec){
+    if (!isAdmin) return;
     form.querySelector('[name="id"]').value = rec?.id || '';
     form.querySelector('[name="Наименование_рыбы"]').value = rec?.Наименование_рыбы || '';
     form.querySelector('[name="Наименование_групповое"]').value = rec?.Наименование_групповое || '';
