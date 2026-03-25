@@ -44,6 +44,11 @@ python app.py
 | POST | /api/auth/login | Вход |
 | POST | /api/auth/logout | Выход |
 | GET | /api/test | Проверка (без авторизации) |
+| GET | /api/admin/responsibles | Список ответственных (для создания сотрудников админом) |
+| GET | /api/admin/users | Список сотрудников (без admin) |
+| POST | /api/admin/users | Создание сотрудника (role=user) |
+| PUT | /api/admin/users/<id>/password | Смена пароля сотрудника |
+| PUT | /api/admin/users/<id>/status | Включить/отключить сотрудника |
 | GET/POST | /api/permissions | Список / создание разрешений |
 | GET/PUT/DELETE | /api/permissions/\<id\> | Разрешение по id |
 | GET/POST | /api/fish | Список / создание рыбы |
@@ -53,7 +58,14 @@ python app.py
 | GET | /api/statistics | Статистика |
 | GET | /api/export-catches | Экспорт CSV |
 | GET | /api/permission-numbers | Список номеров разрешений |
-| GET | /api/fish-names | Список названий рыбы |
+| GET | /api/fish-names | Список названий рыбы (справочник) |
+| GET | /api/fish-names?permission=\<Номер_разрешения\> | Список рыбы по группе выбранного разрешения (для формы `catches.html`) |
+
+## Права пользователей (MVP)
+
+- Администратор (`role=admin`) видит все данные и управляет сотрудниками на странице `/admin-users.html`.
+- Сотрудник (`role=user`) видит только те разрешения, где `Разрешения.Ответственный == full_name`.
+- Сотрудник добавляет вылов только по своим разрешениям (серверная проверка в API).
 
 ## Скриншоты
 
